@@ -2,11 +2,13 @@ package org.arip.controller;
 
 import org.arip.domain.User;
 import org.arip.service.UserService;
+import org.arip.util.ContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -23,8 +25,10 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String getUsers(Model model) {
+    @RequestMapping(value = "/{schema}", method = RequestMethod.GET)
+    public String getUsers(Model model, @PathVariable("schema") String schema) {
+        ContextHolder.setContext(schema);
+
         List<User> users = userService.getUsers();
         model.addAttribute("users", users);
         return "user/list";

@@ -18,11 +18,28 @@
         <property name="suffix" value=".jsp" />
     </bean>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <bean id="parentDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" abstract="true">
         <property name="driverClassName" value="org.postgresql.Driver" />
-        <property name="url" value="jdbc:postgresql://localhost:5432/arip_db?currentSchema=arip-schema1" />
         <property name="username" value="postgres" />
         <property name="password" value="P0stgres" />
+    </bean>
+
+    <bean id="FirstDataSource" parent="parentDataSource">
+        <property name="url" value="jdbc:postgresql://localhost:5432/arip_db?currentSchema=arip-schema1" />
+    </bean>
+
+    <bean id="SecondDataSource" parent="parentDataSource">
+        <property name="url" value="jdbc:postgresql://localhost:5432/arip_db?currentSchema=arip-schema2" />
+    </bean>
+
+    <bean id="dataSource" class="org.arip.util.RoutingDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="first" value-ref="FirstDataSource"/>
+                <entry key="second" value-ref="SecondDataSource"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="FirstDataSource"/>
     </bean>
 
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
