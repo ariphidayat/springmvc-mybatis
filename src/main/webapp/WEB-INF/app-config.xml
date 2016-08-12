@@ -18,32 +18,8 @@
         <property name="suffix" value=".jsp" />
     </bean>
 
-    <bean id="parentDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" abstract="true">
-        <property name="driverClassName" value="org.postgresql.Driver" />
-        <property name="username" value="postgres" />
-        <property name="password" value="P0stgres" />
-    </bean>
-
-    <bean id="FirstDataSource" parent="parentDataSource">
-        <property name="url" value="jdbc:postgresql://localhost:5432/arip_db?currentSchema=arip-schema1" />
-    </bean>
-
-    <bean id="SecondDataSource" parent="parentDataSource">
-        <property name="url" value="jdbc:postgresql://localhost:5432/arip_db?currentSchema=arip-schema2" />
-    </bean>
-
-    <bean id="dataSource" class="org.arip.util.RoutingDataSource">
-        <property name="targetDataSources">
-            <map key-type="java.lang.String">
-                <entry key="first" value-ref="FirstDataSource"/>
-                <entry key="second" value-ref="SecondDataSource"/>
-            </map>
-        </property>
-        <property name="defaultTargetDataSource" ref="FirstDataSource"/>
-    </bean>
-
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="proxyDataSource" />
         <property name="typeAliasesPackage" value="org.arip.domain"/>
         <property name="mapperLocations" value="classpath*:org/arip/persistence/*.xml" />
     </bean>
@@ -59,7 +35,28 @@
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="proxyDataSource" />
+    </bean>
+
+
+    <bean id="dataSourceRegistry" class="org.arip.util.DataSourceFactory"></bean>
+
+    <bean id="dataSourceTargetSource" class="org.arip.util.ContextSwappableTargetSource">
+        <constructor-arg type="java.lang.Class">
+            <value>javax.sql.DataSource</value>
+        </constructor-arg>
+        <property name="targetRegistry" ref="dataSourceRegistry"></property>
+    </bean>
+
+    <bean id="proxyDataSource" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>javax.sql.DataSource</value>
+            </list>
+        </property>
+        <property name="targetSource">
+            <ref bean="dataSourceTargetSource" />
+        </property>
     </bean>
 
 </beans>
