@@ -1,5 +1,6 @@
 package org.arip.util;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -7,10 +8,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ContextHolder {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContextHolder.class);
     private static final ThreadLocal<String> holder = new ThreadLocal<>();
 
     public static void setContext(String context) {
-        LoggerFactory.getLogger(ContextHolder.class).debug("context set '{}'", context);
+        logger.debug("Context set to '{}'", context);
         holder.set(context);
     }
 

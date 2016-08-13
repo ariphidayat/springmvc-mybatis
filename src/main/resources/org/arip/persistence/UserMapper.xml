@@ -3,9 +3,13 @@
 
 <mapper namespace="org.arip.persistence.UserMapper">
 
-    <cache />
-
     <select id="getUsers" resultType="User">
         SELECT id, name, address FROM users
     </select>
+
+    <insert id="insertUser" parameterType="User">
+        INSERT INTO users (id, name, address)
+        VALUES (#{id}, #{name}, #{address})
+    </insert>
+
 </mapper>

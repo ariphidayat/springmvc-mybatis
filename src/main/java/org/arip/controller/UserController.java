@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,5 +33,21 @@ public class UserController {
         List<User> users = userService.getUsers();
         model.addAttribute("users", users);
         return "user/list";
+    }
+
+    @RequestMapping(value = "/{schema}/new", method = RequestMethod.GET)
+    public String create(Model model, @PathVariable("schema") String schema) {
+        User user = new User();
+
+        model.addAttribute("user", user);
+        return "user/form";
+    }
+
+    @RequestMapping(value = "/{schema}/save", method = RequestMethod.POST)
+    public String save(Model model, @PathVariable("schema") String schema, @ModelAttribute User user) {
+        ContextHolder.setContext(schema);
+
+        userService.save(user);
+        return "redirect:/"+ schema;
     }
 }

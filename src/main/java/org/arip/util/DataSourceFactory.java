@@ -15,26 +15,25 @@ public class DataSourceFactory implements TargetRegistry {
 
     @Override
     public DataSource getTarget(String context) {
-        String schema = ContextHolder.getContext();
-        DataSource dataSource = map.get(schema);
+        DataSource dataSource = map.get(context);
 
         if (dataSource == null) {
-            dataSource = getDataSource("postgres", "P0stgres", schema);
-            dataSource = map.putIfAbsent(schema, dataSource);
+            dataSource = getDataSource("postgres", "P0stgres", context);
+            dataSource = map.putIfAbsent(context, dataSource);
             if (dataSource == null) {
                 // put success
-                dataSource = map.get(schema);
+                dataSource = map.get(context);
             }
         }
 
         return dataSource;
     }
 
-    private DataSource getDataSource(String username, String password, String schema) {
+    private DataSource getDataSource(String username, String password, String schemaName) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/arip_db?currentSchema=" + schema);
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/arip_db?currentSchema=" + schemaName);
         return dataSource;
     }
 }
