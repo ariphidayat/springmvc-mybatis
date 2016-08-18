@@ -1,6 +1,6 @@
 package org.arip.util;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -40,14 +40,16 @@ public class DataSourceFactory implements TargetRegistry {
     }
 
     private DataSource getDataSource(String dbName) throws PropertyVetoException {
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setDriverClass(env.getProperty("db.driver"));
-        dataSource.setJdbcUrl(env.getProperty("db.url") + dbName);
-        dataSource.setUser(env.getProperty("db.username"));
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(env.getProperty("db.driver"));
+        dataSource.setUrl(env.getProperty("db.url") + dbName);
+        dataSource.setUsername(env.getProperty("db.username"));
         dataSource.setPassword(env.getProperty("db.password"));
-        dataSource.setMaxPoolSize(Integer.parseInt(env.getProperty("db.maxPoolSize")));
-        dataSource.setMinPoolSize(Integer.parseInt(env.getProperty("db.minPoolSize")));
-        dataSource.setMaxStatements(Integer.parseInt(env.getProperty("db.maxStatement")));
+        dataSource.setDefaultAutoCommit(false);
+        dataSource.setMaxTotal(Integer.parseInt(env.getProperty("cp.maxActive")));
+        dataSource.setMaxIdle(Integer.parseInt(env.getProperty("cp.maxIdle")));
+        dataSource.setMinIdle(Integer.parseInt(env.getProperty("cp.minIdle")));
+        dataSource.setMaxWaitMillis(Long.parseLong(env.getProperty("cp.maxWait")));
         return dataSource;
     }
 }
