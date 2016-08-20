@@ -4,6 +4,7 @@
 
 <html>
     <head>
+        <link rel="shortcut icon" href="">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>User</title>
     </head>
